@@ -121,6 +121,7 @@ export type CreateAppFunction<HostElement> = (
 
 let uid = 0
 
+// 获取实例创建的app，工厂模式
 export function createAppAPI<HostElement>(
   render: RootRenderFunction,
   hydrate?: RootHydrateFunction
@@ -136,6 +137,7 @@ export function createAppAPI<HostElement>(
 
     let isMounted = false
 
+    // vue实例
     const app: App = (context.app = {
       _uid: uid++,
       _component: rootComponent as ConcreteComponent,
@@ -225,12 +227,15 @@ export function createAppAPI<HostElement>(
         return app
       },
 
+      // rootContainer 执行mount时传入的宿主容器
       mount(
         rootContainer: HostElement,
         isHydrate?: boolean,
         isSVG?: boolean
       ): any {
+        // 初始化流程，仅仅执行一次。path会执行多次
         if (!isMounted) {
+          // 获取一个空的vnode
           const vnode = createVNode(
             rootComponent as ConcreteComponent,
             rootProps
@@ -247,8 +252,10 @@ export function createAppAPI<HostElement>(
           }
 
           if (isHydrate && hydrate) {
+            // 服务端渲染的流程
             hydrate(vnode as VNode<Node, Element>, rootContainer as any)
           } else {
+            // 客户端渲染的流程。首次渲染：把传入的vnode转换成真实的dom，追加到rootcontainer
             render(vnode, rootContainer, isSVG)
           }
           isMounted = true
@@ -260,7 +267,7 @@ export function createAppAPI<HostElement>(
             devtoolsInitApp(app, version)
           }
 
-          return vnode.component!.proxy
+          return vnode.component!.proxy  // return了proxy，支持链式调用
         } else if (__DEV__) {
           warn(
             `App has already been mounted.\n` +

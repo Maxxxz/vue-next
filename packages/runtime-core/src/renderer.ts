@@ -402,6 +402,7 @@ export const setRef = (
  * })
  * ```
  */
+// 获取渲染器实例
 export function createRenderer<
   HostNode = RendererNode,
   HostElement = RendererElement
@@ -2293,7 +2294,8 @@ function baseCreateRenderer(
       Element
     >)
   }
-
+  // 所谓渲染器 其实是个对象，包含三个属性：
+  // render-渲染函数；hybrate-注水，用于ssr；createApp-实例创建函数
   return {
     render,
     hydrate,
